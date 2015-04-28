@@ -99,6 +99,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
             int position = recyclerView1.getChildAdapterPosition(child);
             if (items[position] instanceof String)
                 Toast.makeText(this, (String)items[position], Toast.LENGTH_SHORT).show();
+            else {
+                View childCard = recyclerView1.findChildViewUnder(e.getX(), e.getY());
+                HorizontalItemsViewHolder horizontalItemsViewHolder = (HorizontalItemsViewHolder) recyclerView1.findViewHolderForAdapterPosition(position);
+                int grandChildPosition = horizontalItemsViewHolder.getChildItemPosition(e.getX() - childCard.getX(), e.getY() - childCard.getY());
+                if (grandChildPosition < 0)
+                    return false;
+                String[] grandChildren = (String[])items[position];
+                Toast.makeText(this, grandChildren[grandChildPosition], Toast.LENGTH_SHORT).show();
+            }
         }
 
         return false;

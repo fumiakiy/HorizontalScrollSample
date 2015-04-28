@@ -21,4 +21,11 @@ public class HorizontalItemsViewHolder extends ItemViewHolder {
         recyclerView2.setLayoutManager(new LinearLayoutManager(itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         recyclerView2.setAdapter(new ItemAdapter(items));
     }
+
+    public int getChildItemPosition(float x, float y) {
+        View child = recyclerView2.findChildViewUnder(x, y);
+        if (child != null)
+            return recyclerView2.getChildAdapterPosition(child);
+        return -1;
+    }
 }
