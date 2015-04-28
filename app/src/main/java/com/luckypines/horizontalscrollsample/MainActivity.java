@@ -14,14 +14,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
 
     protected RecyclerView recyclerView1;
 
-    private String[] items;
+    private Object[] items;
 
     private GestureDetector gestureDetector;
 
     private void initItems() {
-        items = new String[10];
-        for (int i = 0; i < 10; i++)
-            items[i] = String.format("Item %d", i);
+        items = new Object[10];
+        for (int i = 0; i < 10; i++) {
+            if (i % 3 == 0) {
+                String[] children = new String[5];
+                for (int j = 0; j < 5; j++)
+                    children[j] = String.format("Item %d - %d", i, j);
+                items[i] = children;
+            }
+            else
+                items[i] = String.format("Item %d", i);
+        }
     }
 
     @Override
@@ -29,8 +37,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState != null)
-            items = savedInstanceState.getStringArray("ITEMS");
+        if (savedInstanceState != null) {
+            int length = savedInstanceState.getInt("NUM_ITEMS");
+            if (length > 0) {
+                items = new Object[length];
+                for (int i = 0; i < items.length; i++)
+                    items[i] = savedInstanceState.get("ITEM" + i);
+            }
+        }
 
         if (items == null)
             initItems();
@@ -47,7 +61,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArray("ITEMS", items);
+        if (items == null || items.length <= 0)
+            outState.putInt("NUM_ITEMS", 0);
+        else {
+            outState.putInt("NUM_ITEMS", items.length);
+            for (int i = 0; i < items.length; i++) {
+                if (items[i] instanceof String)
+                    outState.putString("ITEM" + i, (String) items[i]);
+                else
+                    outState.putStringArray("ITEM" + i, (String[]) items[i]);
+            }
+        }
     }
 
     @Override
@@ -73,8 +97,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerView.OnIt
         View child = recyclerView1.findChildViewUnder(e.getX(), e.getY());
         if (child != null && gestureDetector.onTouchEvent(e)) {
             int position = recyclerView1.getChildAdapterPosition(child);
-            String item = items[position];
-            Toast.makeText(this, item, Toast.LENGTH_SHORT).show();
+            if (items[position] instanceof String)
+                Toast.makeText(this, (String)items[position], Toast.LENGTH_SHORT).show();
         }
 
         return false;

@@ -10,10 +10,20 @@ import android.view.ViewGroup;
  */
 public class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
-    private String[] items;
+    private final static int VIEW_TYPE_STRING = 0;
+    private final static int VIEW_TYPE_STRING_ARRAY = 1;
 
-    public ItemAdapter(String[] items) {
+    private Object[] items;
+
+    public ItemAdapter(Object[] items) {
         this.items = items;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (items[position] instanceof String)
+            return VIEW_TYPE_STRING;
+        return VIEW_TYPE_STRING_ARRAY;
     }
 
     @Override
@@ -25,15 +35,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_parent, parent, false);
-        return new ItemViewHolder(view);
+        View view = null;
+        if (viewType == VIEW_TYPE_STRING) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_text, parent, false);
+            return new StringViewHolder(view);
+        }
+        else {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_horizontal_parent, parent, false);
+            return new HorizontalItemsViewHolder(view);
+        }
     }
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
         if (items == null)
             return;
-        String item = items[position];
-        holder.getText1().setText(item);
+        holder.bindView(items[position]);
     }
 }
